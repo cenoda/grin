@@ -197,8 +197,9 @@ App {
         currentView = HomePage
     }
 
-    openSettings() {
-        activeModal = SettingsDialog
+    editUser(user) {
+        // A: pass props on mount
+        activeModal = UserEditor(user: user, mode: "edit")
     }
 
     closeModal() {
@@ -211,8 +212,39 @@ App {
 - `bind:` on a slot → `.gl` controls which component type fills it.
 - `null` → nothing mounted (conditional hide, modal close).
 - Component type assigned → component mounts with its own `.grin`/`.grs`/`.gl` active.
+- **Props on mount:** `ComponentType(key: value, ...)` passes per-instance data to the mounted component. Solves modal/detail-view parameterization.
 - Static slots (no `bind:`) → parent `.grin` fills directly, used for layout composition.
 - Slots are the **only** mechanism for dynamic structure. No `<If>`, no `render()`, no logic in `.grin`.
+- **D: Component types are assignable values.** `currentView: LoginPage` stores a PascalCase type in a camelCase variable — this is allowed. Casing convention governs variable naming, not the value's type.
+
+### Lightweight conditional (hide on null)
+
+For simple show/hide without slot overhead, any component with `[bind: $value]` where the value is `null` renders nothing:
+
+```
+// .grin — Text appears only when errorMessage is non-null
+<Text [bind: $errorMessage]>
+```
+
+```
+// .gl
+Form {
+    errorMessage: null
+
+    "submit-btn".click {
+        if (!valid) {
+            errorMessage = "필드를 확인해주세요"
+        } else {
+            errorMessage = null   // Text disappears
+        }
+    }
+}
+```
+
+- `[bind: $x]` where `$x` is `null` → component does not render.
+- If the bound variable is a primitive (string, number), it renders as content.
+- If the bound variable is a component type, it replaces the host (slot-like behavior on any element).
+- No need to mint a full component + slot for a validation message.
 
 ### Continuous value binding
 
@@ -283,6 +315,8 @@ UserCard {
 - Parent passes props via `[key: value]` on the component.
 - `$props` is read-only inside the component's `.grin` and `.gl`.
 - `.grs` selects by prop values with `ComponentName[prop=value]` syntax.
+- **C: `.grs` prop selectors are discrete-only.** They match exact values (`true`, `"dark"`), not ranges or computations. Continuous data stays in `[ ]` bindings.
+- Prop selectors cascade to descendant elements within the component. `#follow-btn[theme="dark"]` reads the parent component's `theme` prop — no explicit prop threading needed inside the component.
 - Props are the only way a parent communicates with a child component.
 - No prop type declaration — casing convention handles it (camelCase = value, PascalCase = type).
 
