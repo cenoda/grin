@@ -78,8 +78,9 @@ Same `{ }` characters, different semantic context based on the file extension th
 ```
 
 **Rules:**
-- `id:` — unique identifier. Exposed to `.grs` as `#id` and to `.gl` as `camelCaseId`.
-- `class:` — reusable identifier for list templates. Exposed to `.grs` as `.class` and to `.gl` as `className`.
+- `id:` — unique identifier. Referenced in `.grs` as `#id` and in `.gl` as `"id"` (exact string match).
+- `class:` — reusable identifier for list templates. Referenced in `.grs` as `.class` and in `.gl` as `"class"`.
+- No kebab↔camel auto-conversion. The name is the name. Compiler enforces exact match across all three files.
 - `[ ]` — data binding only. `$variable` for reactive values.
 - No `{ }` blocks. No event handlers.
 
@@ -136,7 +137,7 @@ Lists use `<template>` with `bind: $source as alias` for scoped access:
 
 | Token position | Role | `.grs` selector | `.gl` binding |
 |----------------|------|-----------------|---------------|
-| 1st | Binding name | `.follow-btn` | `followBtn.click` |
+| 1st | Binding name | `.follow-btn` | `"follow-btn".click` |
 | 2nd+ | Style variant | `.primary`, `.large-size` | Can be used to disambiguate |
 
 **Variant disambiguation:** when the same binding name appears multiple times in a template:
@@ -150,8 +151,8 @@ Lists use `<template>` with `bind: $source as alias` for scoped access:
 
 ```
 // .gl
-btn.primary.click { ... }
-btn.secondary.click { ... }
+"btn".primary.click { ... }
+"btn".secondary.click { ... }
 ```
 
 ### Event context
@@ -162,7 +163,7 @@ All `as` aliases in the scope chain are automatically loaded into the event para
 // .grin: <Stack [bind: $orgs as org]> ... <Stack [bind: $org.members as user]>
 
 // .gl
-badgeImage.click(event) {
+"badge-image".click(event) {
     badge = event.badge   // clicked item
     user  = event.user    // parent scope (as user)
     org   = event.org     // grandparent scope (as org)
@@ -170,6 +171,48 @@ badgeImage.click(event) {
 ```
 
 No manual chain traversal. No parameter explosion. `as` names become the event context.
+
+---
+
+### Slots & dynamic structure
+
+Slots declare places in the `.grin` tree that `.gl` fills at runtime. This is how conditional rendering, modals, and routing work without `.grin` knowing about logic.
+
+```
+// .grin — slot: declares "a component may be here"
+<Window id: "app">
+    <slot id: "sidebar">
+    <slot id: "body" [bind: $currentView]>
+    <slot id: "modal" [bind: $activeModal]>
+</Window>
+```
+
+```
+// .gl — fills slots, controls what is mounted
+App {
+    currentView: LoginPage
+    activeModal: null
+
+    onLoginSuccess(user) {
+        currentView = HomePage
+    }
+
+    openSettings() {
+        activeModal = SettingsDialog
+    }
+
+    closeModal() {
+        activeModal = null   // unmount
+    }
+}
+```
+
+**Rules:**
+- `bind:` on a slot → `.gl` controls which component type fills it.
+- `null` → nothing mounted (conditional hide, modal close).
+- Component type assigned → component mounts with its own `.grin`/`.grs`/`.gl` active.
+- Static slots (no `bind:`) → parent `.grin` fills directly, used for layout composition.
+- Slots are the **only** mechanism for dynamic structure. No `<If>`, no `render()`, no logic in `.grin`.
 
 ---
 
@@ -256,14 +299,14 @@ State variables declared in `.gl` become selectors in `.grs`. `.grs` defines the
 `.gl` binds to `.grin` components by id or class. `.grin` does not know about these bindings.
 
 ```
-// Static: bind by id
-followBtn.click {
+// Static: bind by id (exact string match — no case conversion)
+"follow-btn".click {
     account.follow(user)
     loading = true
 }
 
 // List: bind by class, receives the item
-userCard.doubleClick(item) {
+"user-card".doubleClick(item) {
     navigate.toProfile(item.id)
 }
 
@@ -273,8 +316,8 @@ init {
 }
 ```
 
-- `id.event` — for unique components (camelCase conversion: `follow-btn` → `followBtn`).
-- `class.event(item)` — for list template instances. `item` is the current list element.
+- `"id".event` — for unique components (exact string match, no name conversion).
+- `"class".event(item)` — for list template instances. `item` is the current list element.
 - `.gl` has zero knowledge of the UI tree, layout, or styling.
 
 ### State variables
@@ -287,7 +330,7 @@ UserProfile {
     loading: false
     saved: false
 
-    saveBtn.click {
+    "save-btn".click {
         loading = true
         await api.save(user)
         loading = false
@@ -296,7 +339,7 @@ UserProfile {
 }
 ```
 
-When `loading = true`, `.grs` rules for `#saveBtn:loading` apply automatically. `.gl` does not touch style properties — it only sets state.
+When `loading = true`, `.grs` rules for `#save-btn:loading` apply automatically. `.gl` does not touch style properties — it only sets state.
 
 ### Cross-component communication
 
@@ -316,7 +359,7 @@ App {
 UserCard {
     user: $user
 
-    followBtn.click {
+    "follow-btn".click {
         await account.follow(user)
         app.notify(user.name + "님 팔로우 시작")
     }
