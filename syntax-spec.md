@@ -98,23 +98,78 @@ Same `{ }` characters, different semantic context based on the file extension th
 
 ### List templates
 
-Lists use `<template>` with `class:` and `$.` scope variables:
+Lists use `<template>` with `bind: $source as alias` for scoped access:
 
 ```
-<Stack id: "user-list" [bind: $users]>
+<Stack id: "org-list" [bind: $orgs as org]>
     <template>
-        <Card class: "user-card">
-            <Image [src: $.avatar]>
-            <Text [value: $.name]>
-            <Button class: "follow-btn" [label: "Follow"]>
-        </Card>
+        <Text [value: $org.name]>
+
+        <Stack id: "user-list" [bind: $org.members as user]>
+            <template>
+                <Text [value: $user.name]>
+
+                <Stack id: "badge-list" [bind: $user.badges as badge]>
+                    <template>
+                        <Image [src: $badge.icon]>
+                        <Text [value: $user.name]>   // parent scope
+                        <Text [value: $org.name]>    // grandparent scope
+                    </template>
+                </Stack>
+            </template>
+        </Stack>
     </template>
 </Stack>
 ```
 
-- `$.avatar`, `$.name` — scoped to the current template item.
-- `class:` not `id:` — templates produce multiple instances, classes are reusable.
-- The binding source (`$users`) is declared once on the parent container.
+**Scoping rules:**
+- `$alias.field` — direct reference. Works at any nesting depth.
+- **Duplicate alias in nested scope is a compile error.** Use a different name.
+- All `as` aliases in the current scope chain are automatically loaded into `.gl` event context.
+- No `$1`, `$2`, `$parent` — only named aliases.
+
+### Component naming (class)
+
+```
+<Button class: "follow-btn primary large-size" [label: "Follow"]>
+```
+
+| Token position | Role | `.grs` selector | `.gl` binding |
+|----------------|------|-----------------|---------------|
+| 1st | Binding name | `.follow-btn` | `followBtn.click` |
+| 2nd+ | Style variant | `.primary`, `.large-size` | Can be used to disambiguate |
+
+**Variant disambiguation:** when the same binding name appears multiple times in a template:
+
+```
+<template>
+    <Button class: "btn primary" [label: "Confirm"]>
+    <Button class: "btn secondary" [label: "Cancel"]>
+</template>
+```
+
+```
+// .gl
+btn.primary.click { ... }
+btn.secondary.click { ... }
+```
+
+### Event context
+
+All `as` aliases in the scope chain are automatically loaded into the event parameter:
+
+```
+// .grin: <Stack [bind: $orgs as org]> ... <Stack [bind: $org.members as user]>
+
+// .gl
+badgeImage.click(event) {
+    badge = event.badge   // clicked item
+    user  = event.user    // parent scope (as user)
+    org   = event.org     // grandparent scope (as org)
+}
+```
+
+No manual chain traversal. No parameter explosion. `as` names become the event context.
 
 ---
 
