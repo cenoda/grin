@@ -45,10 +45,13 @@ C# stands alone — the only major language without a modern successor. F# doesn
 
 ### How `.gl` thinks
 
+**Not for C# veterans.** Python didn't win by persuading Java developers. It won by being the obvious choice for the next generation. Grin takes the same bet: target the developers who will build desktop apps in 2030, not the ones defending XAML in 2025.
+
 Brace syntax. Not Rust-level strict, but concise and unambiguous — because in the AI era, both humans and machines are paying by the token. Every character must carry its weight. Every line must declare its context without ceremony.
 
 - **Kotlin was the template**: Java interop was non-negotiable. C# interop is non-negotiable for Grin.
 - **NuGet is the ecosystem**: Every existing .NET assembly, every NuGet package — callable from `.gl` day one.
+- **Casing is semantics**: `variableName` is a value. `TypeName` is a type. First-letter uppercase on a variable is a compile error. No linter required.
 - **Phase 1: transpile to C#** → compile via Roslyn → run on .NET. Same path Kotlin took with JVM.
 - **Phase 2: LLVM native** — only after the language matures. Kotlin/Native took years. So will this.
 

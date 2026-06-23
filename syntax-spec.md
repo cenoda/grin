@@ -55,6 +55,12 @@
 - Transpile to C# (Phase 1), LLVM native later (Phase 2) — Kotlin's proven path
 - Syntax must be human-readable first, machine-parseable second — but never at war with each other
 
+**Casing convention (enforced at compile time):**
+- `variableName` — camelCase. Always a value.
+- `TypeName` / `FunctionName` — PascalCase. Always a type or function.
+- **First-letter uppercase on a variable is a compile error.** The compiler will treat it as a type reference.
+- No linter needed. Casing *is* semantics. Python proved it works. Go proved it works. Now it graduates from convention to law.
+
 **Placeholder sketch (subject to change):**
 ```
 logic Counter {
