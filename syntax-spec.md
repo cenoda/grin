@@ -298,6 +298,45 @@ UserProfile {
 
 When `loading = true`, `.grs` rules for `#saveBtn:loading` apply automatically. `.gl` does not touch style properties — it only sets state.
 
+### Cross-component communication
+
+Components never talk to each other directly. They communicate through **shared state**:
+
+```
+// app namespace — shared between all components
+App {
+    notifications: []
+
+    notify(message) {
+        notifications.add({ text: message, ts: now() })
+    }
+}
+
+// Component A — sets state, knows nothing about who reads it
+UserCard {
+    user: $user
+
+    followBtn.click {
+        await account.follow(user)
+        app.notify(user.name + "님 팔로우 시작")
+    }
+}
+
+// Component B — reads state, knows nothing about who sets it
+NotificationCenter {
+    list: app.notifications
+
+    item.dismiss(notif) {
+        app.notifications.remove(notif)
+    }
+}
+```
+
+- Components share state through a common namespace (`app`, or any user-defined scope).
+- The sender writes to a shared variable. The receiver reads from it.
+- Neither component imports, references, or depends on the other.
+- `.grin` places both on screen. The only shared surface between components is state.
+
 ### Design constraints
 
 - Full .NET interop — any C# assembly, any NuGet package, callable from `.gl`.
