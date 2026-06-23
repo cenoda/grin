@@ -1,38 +1,47 @@
 # Grin
 
-> C#의 4세대. Kotlin이 Java에 한 일을, Grin은 C#에 한다.
-> HTML/CSS는 올바른 구조다. 데스크톱에도 그게 필요했다.
+> Kotlin is to Java what Grin is to C# — the 4th generation.
+> HTML/CSS is the correct architecture. Desktop deserves it too.
 
 ---
 
 ## Why
 
-### Electron이 증명한 것
+### XAML is not a language for humans
 
-Electron이 느리고 무거운데도 데스크톱 앱 생태계를 점령한 이유는 하나뿐이다:
+If you've written CSS, you will never, ever build a desktop app with XAML again.
 
-**HTML/CSS/JS — 구조·스타일·로직의 3단 분리가 올바른 아키텍처였기 때문.**
+XAML takes the worst of XML — angle brackets swallowing your screen, attributes nested inside attributes inside attributes — and calls it a UI framework. Styling is trapped in `<Style>` blocks. Layout is hidden in `Grid.RowDefinitions` boilerplate. Every styling change requires a recompile. It's a format designed for Visual Studio's property grid, not for developers who actually ship products.
 
-사람들은 성능을 깎아먹으면서까지 브라우저를 통째로 끌고 왔다. 정답을 알지만 정답을 네이티브로 가져올 방법이 없었으니까.
+The web figured this out twenty years ago. Structure goes in one file. Style goes in another. Logic goes in a third. It's not a "best practice" — it's basic hygiene. And yet the .NET ecosystem still forces developers to choose between this and native performance.
 
-### C#의 빈자리
+### Electron proved the architecture was right
 
-3세대 메이저 언어들은 모두 4세대 후계를 얻었다.
+Electron is slow. Electron is bloated. Electron eats RAM for breakfast. And yet it won.
 
-| 3세대 | 4세대 |
-|--------|--------|
+Not because of JavaScript. Not because of npm. But because **HTML/CSS/JS — the three-way separation of structure, style, and logic — is the only architecture that makes sense at scale.** Developers accepted the performance tax of an entire browser engine just to get access to this separation.
+
+The industry didn't need convincing that HTML/CSS is the right model. The industry needed someone to deliver that model **without the browser**.
+
+### The missing 4th generation
+
+Every major 3rd-generation language has a 4th-generation successor.
+
+| 3rd gen | 4th gen |
+|---------|---------|
 | Java | Kotlin |
 | C | Rust |
 | JavaScript | TypeScript |
 | **C#** | **???** |
 
-C#만 유일하게 4세대가 없다. F#은 아무도 안 쓴다.
+C# stands alone — the only major language without a modern successor. F# doesn't count. Nobody uses it.
 
-**Grin says:**
-> `.grin` / `.grs` — 네이티브 데스크톱을 위한 HTML/CSS  
-> `.gl` — C#을 계승하는 4세대 언어  
-> 구조는 Electron의 정답에서 가져오고, 성능은 네이티브로.  
-> 이제 더 이상 브라우저를 끌고 오지 않아도 된다.
+**Grin fills that gap.**
+
+> `.grin` / `.grs` — native desktop structure and style, the way the web does it  
+> `.gl` — the 4th-generation successor to C#  
+> The architecture of Electron, the performance of native.  
+> You never have to drag a browser into your app again.
 
 ---
 
@@ -96,7 +105,8 @@ style {
 
 ## Inspiration
 
-- **HTML/CSS**: 구조와 스타일의 분리 — 데스크톱에도 그게 필요했다
-- **Electron**: 올바른 아키텍처의 승리를 증명했지만, 너무 무거웠다
-- **Kotlin**: Java의 4세대. Grin이 C#에 대해 해내야 할 일의 선례
-- **Rust**: 4세대 언어의 타입 시스템 철학 — 아무도 믿지 않는다
+- **HTML/CSS**: The gold standard of structure/style separation — desktop deserves this
+- **Electron**: Proved the architecture was right, but paid for it with a browser engine
+- **Kotlin**: Java's 4th generation. What Grin intends to be for C#
+- **Rust**: The philosophy of a type system that trusts no one
+
