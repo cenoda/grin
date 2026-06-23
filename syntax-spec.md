@@ -45,13 +45,37 @@
 
 ---
 
-## Logic (separate file: `.gl`)
+## Logic (`.gl` — the 4th-generation language)
 
-> 🚧 PLACEHOLDER — not yet designed
+> Brace syntax. Concise, unambiguous. Not Rust-level strict.
+> Every character must earn its place — humans and AI both pay by the token.
+
+**Design constraints:**
+- Full .NET interop — any C# assembly, any NuGet package, callable from `.gl`
+- Transpile to C# (Phase 1), LLVM native later (Phase 2) — Kotlin's proven path
+- Syntax must be human-readable first, machine-parseable second — but never at war with each other
+
+**Placeholder sketch (subject to change):**
+```
+logic Counter {
+    state count: int = 0
+
+    fun increment() {
+        count = count + 1
+    }
+
+    fun reset() {
+        count = 0
+    }
+}
+```
 
 ---
 
 ## Implementation Status
 
-> 🚧 PLACEHOLDER — not yet designed
+- [x] Lexer (tokenization)
+- [ ] Parser (AST generation)
+- [ ] C# transpiler (Phase 1 — .NET interop via Roslyn)
+- [ ] LLVM native compiler (Phase 2 — after language maturity)
 

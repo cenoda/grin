@@ -43,6 +43,17 @@ C# stands alone — the only major language without a modern successor. F# doesn
 > The architecture of Electron, the performance of native.  
 > You never have to drag a browser into your app again.
 
+### How `.gl` thinks
+
+Brace syntax. Not Rust-level strict, but concise and unambiguous — because in the AI era, both humans and machines are paying by the token. Every character must carry its weight. Every line must declare its context without ceremony.
+
+- **Kotlin was the template**: Java interop was non-negotiable. C# interop is non-negotiable for Grin.
+- **NuGet is the ecosystem**: Every existing .NET assembly, every NuGet package — callable from `.gl` day one.
+- **Phase 1: transpile to C#** → compile via Roslyn → run on .NET. Same path Kotlin took with JVM.
+- **Phase 2: LLVM native** — only after the language matures. Kotlin/Native took years. So will this.
+
+No Python interop (yet). We want it. We're not stupid enough to promise it.
+
 ---
 
 ## Example
