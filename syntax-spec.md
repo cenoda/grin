@@ -214,6 +214,84 @@ App {
 - Static slots (no `bind:`) → parent `.grin` fills directly, used for layout composition.
 - Slots are the **only** mechanism for dynamic structure. No `<If>`, no `render()`, no logic in `.grin`.
 
+### Continuous value binding
+
+Boolean states use `:state` selectors in `.grs`. Continuous values (progress, colors, transforms) use `[ ]` data bindings in `.grin`:
+
+```
+// .gl — sets the value, knows nothing about how it's displayed
+FileDownload {
+    percent: 0
+
+    onProgress(bytes, total) {
+        percent = bytes / total * 100
+    }
+}
+
+// .grin — binds the value to a component that knows how to render it
+<ProgressBar id: "download-bar" [value: $percent, max: 100]>
+
+// .grs — static shell only, component handles the fill internally
+#download-bar {
+    height: 6, radius: 3
+    bg: "surface"
+}
+#download-bar::fill {
+    bg: "accent"
+    transition: width 300ms ease
+}
+```
+
+| Value type | Mechanism | Where |
+|------------|-----------|-------|
+| Boolean (`loading`, `disabled`) | `:state` selector | `.grs` |
+| Continuous (`percent`, `color`) | `[ ]` data binding | `.grin` |
+| Static (`radius`, `font-size`) | `{ }` property | `.grs` |
+
+### Custom components
+
+Custom components are defined by convention: three files sharing a base name.
+
+```
+// UserCard.grin
+<Card id: "user-card">
+    <Image id: "avatar" [src: $props.user.avatar]>
+    <Text id: "name" [value: $props.user.name]>
+    <Button id: "follow-btn" [label: "Follow"]>
+</Card>
+
+// UserCard.grs
+UserCard[compact=true] {
+    pad: 8
+    font-size: 14
+}
+#follow-btn[theme="dark"] {
+    bg: "dark-accent"
+}
+
+// UserCard.gl
+UserCard {
+    user: $props.user
+
+    init {
+        loadProfile(user)
+    }
+}
+```
+
+**Props rules:**
+- Parent passes props via `[key: value]` on the component.
+- `$props` is read-only inside the component's `.grin` and `.gl`.
+- `.grs` selects by prop values with `ComponentName[prop=value]` syntax.
+- Props are the only way a parent communicates with a child component.
+- No prop type declaration — casing convention handles it (camelCase = value, PascalCase = type).
+
+**Usage:**
+```
+// .grin
+<UserCard [user: $currentUser, theme: "dark", compact: true]>
+```
+
 ---
 
 ## `.grs` — Style
