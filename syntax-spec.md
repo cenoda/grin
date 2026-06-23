@@ -29,19 +29,82 @@
 
 ## Components
 
-> 🚧 PLACEHOLDER — not yet designed
+Components use **bracket semantics** — the bracket shape declares the nature of the content:
+
+| Bracket | Role | Example |
+|---------|------|---------|
+| `< >` `</>` | **Structure** — what component | `<Card>` `</Card>` |
+| `{ }` | **Expression** — visual properties, layout | `{layout: row, gap: 16}` |
+| `[ ]` | **Data** — values, bindings | `[value: $user.name]` |
+| `( )` | **Action** — event handlers | `(click: account.follow)` |
+
+```
+<Card> {layout: row, gap: 16, pad: 20, bg: "surface-mid", radius: 12}
+    
+    <Image> [src: $user.avatar, alt: "Profile"]
+        {size: 48, ratio: "1:1"}
+    
+    <Stack> {layout: col, gap: 4, flex: 1}
+        <Text> [value: $user.name]
+            {size: 18, weight: "bold", color: "main"}
+        <Text> [value: $user.bio]
+            {size: 14, color: "muted"}
+    </Stack>
+    
+    <Button> [label: "Follow"]
+        (click: account.follow)
+        {variant: "primary", width: "auto"}
+
+</Card>
+```
+
+### Built-in components
+
+| Component | Data `[]` | Action `()` |
+|-----------|-----------|-------------|
+| `Window` | `[title]` | — |
+| `Label` / `Text` | `[value]` | — |
+| `Input` | `[bind: $var, placeholder]` | `(change:)` |
+| `Button` | `[label]` | `(click:)` |
+| `Image` | `[src, alt]` | — |
+| `List` | `[bind: $collection]` | — |
+| `Stack` | — | — |
+| `Grid` | — | — |
+| `Card` | — | — |
+
+### Layout containers (`{ }`)
+
+```
+{layout: row | col | grid, gap: N, pad: N, flex: N}
+```
 
 ---
 
-## Common Properties
+## Style (`.grs` — overrides expression defaults)
 
-> 🚧 PLACEHOLDER — not yet designed
+`.grin` provides default `{ }` values. `.grs` overrides them with standard CSS-like selectors:
 
----
+```
+Card {
+    bg: "surface-dark"
+    radius: 8
+}
 
-## Style (separate file: `.grs`)
+Button.primary {
+    bg: "#4a90d9"
+    color: white
+    pad: 8 16
+}
 
-> 🚧 PLACEHOLDER — not yet designed
+Text.muted {
+    color: "#888"
+}
+```
+
+- Select by component type: `Card { }`
+- Select by variant: `Button.primary { }`
+- Select by component + variant: `Card.highlight { }`
+- `.grs` always wins over `.grin` defaults.
 
 ---
 
